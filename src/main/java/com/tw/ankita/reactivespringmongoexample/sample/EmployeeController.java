@@ -11,6 +11,7 @@ import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
 import java.time.Duration;
+import java.util.NoSuchElementException;
 import java.util.stream.Stream;
 
 @RestController
@@ -26,13 +27,17 @@ public class EmployeeController {
 
     @GetMapping("/all")
     public Flux<Employee> getAll() {
-
         return employeeRepository.findAll();
     }
 
     @GetMapping("/{id}")
-    public Mono<Employee> getById(@PathVariable Long id) {
-        return employeeRepository.findById(id);
+    public Mono<Employee> getById(@PathVariable Long id) throws NoSuchFieldException {
+       Mono<Employee> employee = employeeRepository.findById(id);
+
+       if( employee.block() == null)
+           throw new NoSuchElementException("Employee with id "+ id + " not found");
+
+       return employee;
     }
 
     @GetMapping(value = "/{id}/events", produces = MediaType.TEXT_EVENT_STREAM_VALUE)

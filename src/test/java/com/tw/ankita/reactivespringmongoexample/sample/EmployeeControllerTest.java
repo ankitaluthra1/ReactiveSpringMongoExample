@@ -17,11 +17,13 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.test.StepVerifier;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -91,6 +93,13 @@ public class EmployeeControllerTest {
 
         StepVerifier.create(employeeController.getEmployeeEvents(1L).take(5).collectList())
                 .expectNextMatches(l -> l.size() == 5).verifyComplete();
+
+    }
+
+    @Test
+    public void shouldAssertException(){
+        Exception exception = assertThrows(NoSuchElementException.class,()->employeeController.getById(10L).block());
+        assertEquals("Employee with id 10 not found",exception.getMessage());
 
     }
 
