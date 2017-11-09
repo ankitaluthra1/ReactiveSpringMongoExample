@@ -26,7 +26,6 @@ public class EmployeeController {
 
     @GetMapping("/all")
     public Flux<Employee> getAll() {
-
         return employeeRepository.findAll();
     }
 
