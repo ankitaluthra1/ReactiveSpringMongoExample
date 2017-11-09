@@ -1,29 +1,16 @@
 package com.tw.ankita.reactivespringmongoexample.sample;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
 public class EmployeeEvent {
 
-    String name;
-    Long id;
-    Long timestamp;
+    private String name;
+    private Long id;
+    private Long timestamp;
 
-    public EmployeeEvent(String name, Long id, Long timestamp) {
-        this.name = name;
-        this.id = id;
-        this.timestamp = timestamp;
-    }
-
-    public EmployeeEvent() {
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Long getTimestamp() {
-        return timestamp;
-    }
 }

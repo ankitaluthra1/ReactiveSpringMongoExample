@@ -1,10 +1,14 @@
 package com.tw.ankita.reactivespringmongoexample.sample;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-//@AllArgsConstructor
-//@Getter
+@AllArgsConstructor
+@Getter
+@NoArgsConstructor
 @Document(collection = "employees")
 public class Employee {
 
@@ -12,19 +16,4 @@ public class Employee {
     private Long employeeId;
     private String name;
 
-    public Employee() {
-    }
-
-    public Employee(Long employeeId, String name) {
-        this.employeeId = employeeId;
-        this.name = name;
-    }
-
-    public Long getEmployeeId() {
-        return employeeId;
-    }
-
-    public String getName() {
-        return name;
-    }
 }

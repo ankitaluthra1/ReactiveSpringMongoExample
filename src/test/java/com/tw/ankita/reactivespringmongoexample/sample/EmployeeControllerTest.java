@@ -67,8 +67,6 @@ public class EmployeeControllerTest {
 
     }
 
-
-
     @Test
     @Ignore
     @DisplayName("returns random result as its async")
@@ -89,9 +87,7 @@ public class EmployeeControllerTest {
     public void shouldVerifyNonbBlockingReturn() {
 
         employeeRepository.deleteAll().subscribe(e -> System.out.println(e + " deleted all"));
-        employeeRepository.save(new Employee(1L, "Ankita")).subscribe(e -> {
-            System.out.println(e.getName());
-        });
+        employeeRepository.save(new Employee(1L, "Ankita")).block();
 
         StepVerifier.create(employeeController.getEmployeeEvents(1L).take(5).collectList())
                 .expectNextMatches(l -> l.size() == 5).verifyComplete();
