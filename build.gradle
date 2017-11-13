@@ -36,4 +36,5 @@ dependencies {
     testCompile('org.junit.jupiter:junit-jupiter-api:5.0.1')
 
     compileOnly('org.projectlombok:lombok:1.16.18')
+
 }

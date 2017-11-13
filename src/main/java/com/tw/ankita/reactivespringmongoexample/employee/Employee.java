@@ -1,4 +1,4 @@
-package com.tw.ankita.reactivespringmongoexample.sample;
+package com.tw.ankita.reactivespringmongoexample.employee;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

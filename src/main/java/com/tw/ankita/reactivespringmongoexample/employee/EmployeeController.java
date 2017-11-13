@@ -1,11 +1,8 @@
-package com.tw.ankita.reactivespringmongoexample.sample;
+package com.tw.ankita.reactivespringmongoexample.employee;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
@@ -15,7 +12,7 @@ import java.util.NoSuchElementException;
 import java.util.stream.Stream;
 
 @RestController
-@RequestMapping("/sample")
+@RequestMapping("/employees")
 public class EmployeeController {
 
     private EmployeeRepository employeeRepository;
@@ -28,12 +25,13 @@ public class EmployeeController {
     @GetMapping("/all")
     public Flux<Employee> getAll() {
         return employeeRepository.findAll();
+
+
     }
 
     @GetMapping("/{id}")
     public Mono<Employee> getById(@PathVariable Long id) throws NoSuchFieldException {
        Mono<Employee> employee = employeeRepository.findById(id);
-
        if( employee.block() == null)
            throw new NoSuchElementException("Employee with id "+ id + " not found");
 
@@ -51,8 +49,11 @@ public class EmployeeController {
 
             return Flux.zip(interval, employeeEventFlux).map(Tuple2::getT2);
         });
-
     }
 
+    @PostMapping("/save")
+    public Mono<Employee> saveEmployee(@RequestBody Employee employee){
+        return employeeRepository.save(employee);
+    }
 
 }

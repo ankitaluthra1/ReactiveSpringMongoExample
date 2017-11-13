@@ -1,4 +1,4 @@
-package com.tw.ankita.reactivespringmongoexample.sample;
+package com.tw.ankita.reactivespringmongoexample.employee;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.reactive.server.FluxExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.reactive.function.BodyInserters;
 import reactor.test.StepVerifier;
 
 import java.util.List;
@@ -23,6 +24,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -43,21 +45,29 @@ public class EmployeeControllerTest {
     @Before
     public void setup() {
         webTestClient = WebTestClient.bindToController(employeeController).build();
+        employeeRepository.deleteAll().block();
     }
 
     @Test
     public void shouldGetListForAllEmployees() {
-        FluxExchangeResult<EmployeeEvent> result = webTestClient.get().uri("/sample/all").exchange()
-                .expectStatus().isOk().returnResult(new ParameterizedTypeReference<EmployeeEvent>() {
-                });
 
+        employeeRepository.save(new Employee(1L, "A")).block();
+        employeeRepository.save(new Employee(2L, "B")).block();
+        employeeRepository.save(new Employee(3L, "C")).block();
+        employeeRepository.save(new Employee(4L, "D")).block();
+
+        FluxExchangeResult<Employee> result = webTestClient.get().uri("/employees/all").exchange()
+                .expectStatus().isOk().returnResult(Employee.class);
 
         StepVerifier.create(result.getResponseBody().collectList()).expectNextMatches(l -> l.size() == 4).verifyComplete();
     }
 
     @Test
     public void shouldGetEmployeeById() {
-        FluxExchangeResult<Employee> result = webTestClient.get().uri("/sample/2").exchange()
+        employeeRepository.save(new Employee(1L, "A")).block();
+        employeeRepository.save(new Employee(2L, "B")).block();
+
+        FluxExchangeResult<Employee> result = webTestClient.get().uri("/employees/2").exchange()
                 .expectStatus().isOk().returnResult(new ParameterizedTypeReference<Employee>() {
                 });
 
@@ -70,11 +80,23 @@ public class EmployeeControllerTest {
     }
 
     @Test
+    public void shouldSaveEmployee(){
+        Employee employee = new Employee(1L, "A");
+        FluxExchangeResult<Employee> result = webTestClient.post().uri("/employees/save").body(BodyInserters.fromObject(employee))
+                    .exchange()
+                .expectStatus().isOk().returnResult(new ParameterizedTypeReference<Employee>() {
+                });
+
+        assertTrue(1L == result.getResponseBody().blockFirst().getEmployeeId());
+
+    }
+
+    @Test
     @Ignore
     @DisplayName("returns random result as its async")
     public void shouldGetListOfAllEmployeesWithTestRestTemplate() {
         ResponseEntity<List> response = testRestTemplate.
-                getForEntity("/sample/all", List.class);
+                getForEntity("/employees/all", List.class);
 
         assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
 
@@ -87,9 +109,7 @@ public class EmployeeControllerTest {
     @Test
     @DisplayName("Returns first five results from infinite stream ")
     public void shouldVerifyNonbBlockingReturn() {
-
-        employeeRepository.deleteAll().subscribe(e -> System.out.println(e + " deleted all"));
-        employeeRepository.save(new Employee(1L, "Ankita")).block();
+        assumeTrue(employeeRepository.save(new Employee(1L, "Ankita")).block() != null);
 
         StepVerifier.create(employeeController.getEmployeeEvents(1L).take(5).collectList())
                 .expectNextMatches(l -> l.size() == 5).verifyComplete();
